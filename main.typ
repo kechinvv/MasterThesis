@@ -1,12 +1,8 @@
 #set document(title: "Thesis Title", author: "Your Name")
 
 
-
 #import "settings.typ": settings
 
-// У typst проблема, что он не умеет делать отступ на первом абзаце
-// приходится явно выставлять его у каждого первого абзаца, т.е после заголовка
-#import "utils.typ": fix-par
 #show: settings
 
 #include "parts/shorts.typ"
@@ -18,3 +14,17 @@
 #include "parts/realization.typ"
 #include "parts/results.typ"
 #include "parts/conclusion.typ"
+
+= Cписок использованных источников <nonumber>
+
+#bibliography(
+  "bib.bib",
+  title: none,
+  style: "gost-r-705-2008-numeric",
+)
+
+
+
+
+
+

@@ -1,5 +1,1 @@
-#import "../utils.typ": fix-par
-
-= Пути решения
-
-#fix-par()
+= Пути решения <selection_part>
