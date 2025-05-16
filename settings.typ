@@ -66,9 +66,10 @@
     #set align(left)
     #set text(size: 12pt)
     Таблица #it.counter.display() --- #it.caption.body
+    #it.body
   ]
 
-  // Table caption styling
+  // Code caption styling
   #show figure.where(kind: raw) : it => [
     #set align(center)
     #set text(size: 12pt)
