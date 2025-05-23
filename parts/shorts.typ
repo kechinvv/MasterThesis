@@ -10,5 +10,5 @@
 - ДА - динамический анализ
 - CFG - Control Flow Graph
 - ICFG - Inter-procedural Control Flow Graph
-
+- ВМ - виртуальная машина
 
