@@ -111,7 +111,62 @@ ICFG представляет собой все возможные пути вы
 - Глубина обхода. Изначально устанавливается некоторое число, которое уменьшается каждый раз, когда мы уходим в реализацию вызова. Когда глубина равна 0, обход не может попасть в реализацию какого-либо вызова в рассматриваемом методе и обязан пройти его до конца. Возвращаясь на уровень выше, глубина инкрементируется.
 - Длина. Задает лимит по количеству вершин графа в рамках обхода.
 
+Извлечение трасс из ICFG представляет собой рекурсивный обход в глубину. Псевдокод алгоритма приведен на @graph_traverse_alg. Каждое ветвление имеет собственные набор трасс, при этом оно содержит общую часть с трассами, которые будут собраны для других веток (имеются ввиду ветки в одной и той же точке программы). Для того, чтобы не копировать наборы трасс, в методе фиксируется, какие из них были дополнены на данной итерации. В конце каждого вызова, после выполнения рекурсивных методов, с помощью сохраненных индексов трассы приводятся в свое изначально состояние, которое было до ветвления. Сами трассы сохраняются в БД по достижению ограничений на обход или обходу всей программы. Для обхода в глубину самих вызовов в специальном стеке сохраняется точка в программе, к которой необходимо вернуться после рассмотрения метода до конца. Когда вызываемый метод рассмотрен, точка возврата снимается со стека.
+
+Для поиска вызовов конкретной библиотеки выполняется сравнение с указанным префиксом названий пакетов. Обнаружив вызов, необходимо применить points-to анализ (на основе алгоритме Андерсена) для объекта вызова и объектов из уже накопленных трасс. Если переменные могут указывать на один и тот же объект, то вызов помещается в соответствующую трассу, иначе создается новая.
+
 При обходе перебираются все возможные в рамках наложенных ограничений по длине и глубине комбинации ветвлений. Благодаря этому возможно получение высокого покрытия кода и сбора содержательных трасс вызовов.
+
+#figure(
+  ```fun graphTraverseLib(
+        startPoint: Unit,
+        isMainMethod: Boolean,
+        ttl: Int = configuration.traversJumps,
+        depth: Int = configuration.traversDepth
+    ) {
+        val currentSuccessors = icfg.getSuccsOf(startPoint)
+        if (currentSuccessors.size == 0 || ttl <= 0) {
+            if (ttl <= 0 || isMainMethod) {
+                save(extracted)
+            } else {
+                val succInfo = continueStack.removeLast()
+                graphTraverseLib(succInfo.first, succInfo.second, ttl - 1, depth + 1)
+                continueStack.add(succInfo)
+            }
+        } else {
+            for (succ in currentSuccessors) {
+                var method: SootMethod? = null
+                var continueAdded = false
+                var klass: String? = null
+                var indexesOfChangedTraces: List<Int>? = null
+                    if (succ is JInvokeStmt || succ is JAssignStmt) {
+                        succ as AbstractStmt
+                        if (succ.invokeExpr.method.declaringClass in Scene.v().applicationClasses)
+                            method = succ.invokeExpr.method
+                        if (method?.foundLib(lib)) {
+                            val methodLib = succ.invokeExpr.method
+                            klass = if (methodLib.isStatic) "${methodLib.declaringClass}__static"
+                                    else methodLib.declaringClass.toString()
+                            if (extracted[klass] == null) extracted[klass] = mutableListOf()
+                            indexesOfChangedTraces = saveInvokeToTrace(succ.invokeExpr, extracted[klass]!!)
+                        }
+                    }
+                if (method != null && depth > 0 && method.declaringClass in Scene.v().applicationClasses) {
+                    continueStack.add(Pair(succ, isMethod))
+                    continueAdded = true
+                    icfg.getStartPointsOf(method).forEach { methodStart ->
+                        graphTraverseLib(methodStart, false, ttl - 1, depth - 1)
+                    }
+                } else graphTraverseLib(succ, isMainMethod, ttl - 1, depth)
+
+                if (indexesOfChangedTraces != null) resetTraces(indexesOfChangedTraces, extracted[klass]!!)
+                if (continueAdded) continueStack.removeLast()
+            }
+        }
+    }```,
+  caption: "Псевдокод алгоритма обхода"
+) <graph_traverse_alg>
+
 
 === Динамическое извлечение трасс
 
