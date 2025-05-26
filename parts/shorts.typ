@@ -11,4 +11,4 @@
 - CFG - Control Flow Graph
 - ICFG - Inter-procedural Control Flow Graph
 - ВМ - виртуальная машина
-
+- ОС - операционная система
