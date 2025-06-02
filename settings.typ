@@ -6,7 +6,7 @@
     numbering: "1",
     number-align: center,
   )
-  #counter(page).update(6)
+  #counter(page).update(4)
 
   // Font and language settings
   #set text(

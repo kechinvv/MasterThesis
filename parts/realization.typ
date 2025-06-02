@@ -148,8 +148,7 @@ ICFG представляет собой все возможные пути вы
                             method = succ.invokeExpr.method
                         if (method?.foundLib(lib)) {
                             val methodLib = succ.invokeExpr.method
-                            klass = if (methodLib.isStatic) "${methodLib.declaringClass}__static"
-                                    else methodLib.declaringClass.toString()
+                            klass = methodLib.declaringClass.toString()
                             if (extracted[klass] == null) extracted[klass] = mutableListOf()
                             indexesOfChangedTraces = saveInvokeToTrace(succ.invokeExpr, extracted[klass])
                         }
