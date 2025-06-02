@@ -147,15 +147,13 @@ ICFG представляет собой все возможные пути вы
                         if (succ.invokeExpr.method.declaringClass in Scene.v().applicationClasses)
                             method = succ.invokeExpr.method
                         if (method?.foundLib(lib)) {
-                            val methodLib = succ.invokeExpr.method
-                            klass = methodLib.declaringClass.toString()
+                            klass = method.declaringClass.toString()
                             if (extracted[klass] == null) extracted[klass] = mutableListOf()
                             indexesOfChangedTraces = saveInvokeToTrace(succ.invokeExpr, extracted[klass])
                         }
                     }
-                if (method != null && depth > 0 && method.declaringClass in Scene.v().applicationClasses) {
-                    continueStack.add(Pair(succ, isMethod))
-                    continueAdded = true
+                if (method != null && depth > 0) {
+                    continueAdded = continueStack.add(Pair(succ, isMainMethod))
                     icfg.getStartPointsOf(method).forEach { methodStart ->
                         graphTraverseLib(methodStart, false, ttl - 1, depth - 1)
                     }
