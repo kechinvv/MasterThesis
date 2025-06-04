@@ -2,6 +2,7 @@
 
 - КА -- конечный автомат
 - ПО -- программное обеспечение
+- API -- application programming interface
 - ICFG -- inter-procedural control flow graph
 - JAR -- Java archive
 - JVM -- Java virtual machine
