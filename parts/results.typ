@@ -74,7 +74,7 @@ Signature содержит гораздо больше вызовов, чем р
 ) <own_signature>
 
 #figure(
-  image("../img/sign_ground.png"),
+  image("../img/sign_ground.png", height: 75%),
   caption: "Эталонная модель Signature"
 ) <ground_signature>
 
